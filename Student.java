@@ -1,36 +1,40 @@
+// Represents a student and their academic performance
 public class Student {
+    // Instance variables to store student details
     String name;
     int roll;
     int[] marks;
     double average;
     char grade;
 
+    // Constructor to initialize student details and calculate derived data
     public Student(String name, int roll, int[] marks) {
         this.name = name;
         this.roll = roll;
         this.marks = marks;
-        calculateAverage();
-        assignGrade();
+        calculateAverage(); // Calculate average based on marks
+        assignGrade();      // Assign grade based on average
     }
 
-
+    // Private method to calculate average marks
     private void calculateAverage() {
         int total = 0;
         for (int i = 0; i < marks.length; i++) {
-            total += marks[i];  // same as total = total + marks[i];
+            total += marks[i];  // Add each subject mark to total
         }
-        this.average = total / 5.0;
+        this.average = total / 5.0; // Calculate average for 5 subjects
     }
 
+    // Private method to assign a grade based on average
     private void assignGrade() {
         if (average >= 90) grade = 'A';
         else if (average >= 75) grade = 'B';
         else if (average >= 60) grade = 'C';
         else if (average >= 40) grade = 'D';
-        else grade = 'F';
-
+        else grade = 'F'; // Grade 'F' for failing scores
     }
 
+    // Converts the student's data to a comma-separated string for file storage
     public String toFileFormat() {
         StringBuilder sb = new StringBuilder();
         sb.append(name).append(",").append(roll).append(",");
@@ -41,19 +45,20 @@ public class Student {
         return sb.toString();
     }
 
+    // Creates a Student object from a comma-separated string (reverse of toFileFormat)
     public static Student fromFileFormat(String line) {
         String[] parts = line.split(",");
         String name = parts[0];
         int roll = Integer.parseInt(parts[1]);
         int[] marks = new int[5];
         for (int i = 0; i < 5; i++) {
-            marks[i] = Integer.parseInt(parts[i + 2]);
+            marks[i] = Integer.parseInt(parts[i + 2]); // Extract marks from string
         }
-        // Don't parse average or grade from file — just reconstruct them in constructor
+        // Average and grade will be recalculated in constructor
         return new Student(name, roll, marks);
     }
 
-
+    // Prints the student's information to the console
     public void display() {
         System.out.println("Name: " + name);
         System.out.println("Roll: " + roll);
@@ -65,4 +70,3 @@ public class Student {
         System.out.println("Grade: " + grade);
     }
 }
-
