@@ -1,12 +1,15 @@
 import java.io.*;
 import java.util.*;
 
+// Main class to analyze and manage student results
 public class StudentResultAnalyzer {
-    static final String FILE_NAME = "results.txt";
+    static final String FILE_NAME = "results.txt"; // File to store student data
 
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
         int choice;
+
+        // Display menu and loop until user chooses to exit
         do {
             System.out.println("\n=== Student Result Analyzer ===");
             System.out.println("1. Add Result");
@@ -16,33 +19,45 @@ public class StudentResultAnalyzer {
             System.out.println("5. Exit");
             System.out.print("Enter your choice: ");
             choice = sc.nextInt();
+
+            // Use switch-case to handle user options
             try {
                 switch (choice) {
-                    case 1: addStudent(sc);
-                    break;
-                    case 2: showAllStudents();
-                    break;
-                    case 3: showTopper();
-                    break;
-                    case 4: searchStudent(sc);
-                    break;
-                    case 5: System.out.println("Exiting...");
-                    break;
-                    default: System.out.println("Invalid choice!");
+                    case 1:
+                        addStudent(sc);  // Add new student result
+                        break;
+                    case 2:
+                        showAllStudents();  // Display all student records
+                        break;
+                    case 3:
+                        showTopper();  // Find and display student with highest average
+                        break;
+                    case 4:
+                        searchStudent(sc);  // Search student by roll number
+                        break;
+                    case 5:
+                        System.out.println("Exiting...");  // Exit program
+                        break;
+                    default:
+                        System.out.println("Invalid choice!");
                 }
             } catch (IOException e) {
                 System.out.println("I/O Error: " + e.getMessage());
             }
-        } while (choice != 5);
-        sc.close();
+        } while (choice != 5); // Continue until user chooses to exit
+
+        sc.close(); // Close scanner to prevent memory leak
     }
 
+    // Adds a student's data and writes it to a file
     static void addStudent(Scanner sc) throws IOException {
-        sc.nextLine(); // consume newline
+        sc.nextLine(); // Consume newline character
         System.out.print("Enter Name: ");
         String name = sc.nextLine();
         System.out.print("Enter Roll No: ");
         int roll = sc.nextInt();
+
+        // Read marks for 5 subjects
         int[] marks = new int[5];
         System.out.println("Enter marks for 5 subjects:");
         for (int i = 0; i < 5; i++) {
@@ -50,69 +65,90 @@ public class StudentResultAnalyzer {
             marks[i] = sc.nextInt();
         }
 
-        Student s = new Student(name, roll, marks);
-        // Ensure file exists (creates if missing)
+        Student s = new Student(name, roll, marks); // Create student object
+
+        // Ensure the results file exists
         File file = new File(FILE_NAME);
         if (!file.exists()) file.createNewFile();
 
+        // Append student data to the file
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(file, true))) {
             writer.write(s.toFileFormat());
             writer.newLine();
         }
+
         System.out.println("Result added successfully!");
     }
 
+    // Loads student data from the file and returns a list
     static List<Student> loadStudents() throws IOException {
         File file = new File(FILE_NAME);
+
+        // If file doesn't exist or is empty, return an empty list
         if (!file.exists() || file.length() == 0) {
-            // no file or empty file → return empty list
             return new ArrayList<>();
         }
 
         List<Student> students = new ArrayList<>();
+
+        // Read each line and convert it into a Student object
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 students.add(Student.fromFileFormat(line));
             }
         }
+
         return students;
     }
 
+    // Displays details of all students
     static void showAllStudents() throws IOException {
         List<Student> students = loadStudents();
+
         if (students.isEmpty()) {
             System.out.println("No records found. Please add a student first.");
             return;
         }
+
         for (Student s : students) {
             System.out.println("\n---------------------");
-            s.display();
+            s.display(); // Use Student class display method
         }
     }
 
+    // Finds and shows the student with the highest average
     static void showTopper() throws IOException {
         List<Student> students = loadStudents();
+
         if (students.isEmpty()) {
             System.out.println("No records found. Please add a student first.");
             return;
         }
+
         Student topper = students.get(0);
         for (Student s : students) {
-            if (s.average > topper.average) topper = s;
+            if (s.average > topper.average) {
+                topper = s;
+            }
         }
+
         System.out.println("Topper Details:");
         topper.display();
     }
 
+    // Searches for a student by roll number
     static void searchStudent(Scanner sc) throws IOException {
         List<Student> students = loadStudents();
+
         if (students.isEmpty()) {
             System.out.println("No records found. Please add a student first.");
             return;
         }
+
         System.out.print("Enter roll number to search: ");
         int roll = sc.nextInt();
+
         for (Student s : students) {
             if (s.roll == roll) {
                 System.out.println("Student Found:");
@@ -120,6 +156,7 @@ public class StudentResultAnalyzer {
                 return;
             }
         }
+
         System.out.println("Student not found.");
     }
 }
