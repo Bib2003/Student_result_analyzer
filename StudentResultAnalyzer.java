@@ -16,7 +16,9 @@ public class StudentResultAnalyzer {
             System.out.println("2. Show All");
             System.out.println("3. Show Topper");
             System.out.println("4. Search by Roll No");
-            System.out.println("5. Exit");
+            System.out.println("5. Delete by Roll number");
+            System.out.println("6. Remove duplicates");
+            System.out.println("7. Exit");
             System.out.print("Enter your choice: ");
             choice = sc.nextInt();
 
@@ -36,15 +38,22 @@ public class StudentResultAnalyzer {
                         searchStudent(sc);  // Search student by roll number
                         break;
                     case 5:
+                        deleteStudent(sc);
+                        break;
+                    case 6:
+                        removeDuplicates();
+                        break;
+                    case 7:
                         System.out.println("Exiting...");  // Exit program
                         break;
+
                     default:
                         System.out.println("Invalid choice!");
                 }
             } catch (IOException e) {
                 System.out.println("I/O Error: " + e.getMessage());
             }
-        } while (choice != 5); // Continue until user chooses to exit
+        } while (choice != 7); // Continue until user chooses to exit
 
         sc.close(); // Close scanner to prevent memory leak
     }
@@ -158,5 +167,55 @@ public class StudentResultAnalyzer {
         }
 
         System.out.println("Student not found.");
+
+
+    }
+    static void deleteStudent(Scanner sc) throws IOException {
+        List<Student> students = loadStudents();
+
+        if (students.isEmpty()) {
+            System.out.println("No records found.");
+            return;
+        }
+
+        System.out.print("Enter roll number to delete: ");
+        int roll = sc.nextInt();
+
+        boolean removed = students.removeIf(s -> s.roll == roll);
+
+        if (removed) {
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_NAME))) {
+                for (Student s : students) {
+                    writer.write(s.toFileFormat());
+                    writer.newLine();
+                }
+            }
+            System.out.println("Student record deleted.");
+        } else {
+            System.out.println("Roll number not found.");
+        }
+    }
+
+    static void removeDuplicates() throws IOException {
+        List<Student> students = loadStudents();
+        Set<Integer> seenRolls = new HashSet<>();
+        List<Student> uniqueStudents = new ArrayList<>();
+
+        for (Student s : students) {
+            if (!seenRolls.contains(s.roll)) {
+                uniqueStudents.add(s);
+                seenRolls.add(s.roll);
+            }
+        }
+
+        // Overwrite file with unique student list
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_NAME))) {
+            for (Student s : uniqueStudents) {
+                writer.write(s.toFileFormat());
+                writer.newLine();
+            }
+        }
+
+        System.out.println("Duplicates (if any) removed.");
     }
 }
