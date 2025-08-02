@@ -21,7 +21,8 @@ public class Student {
         for (int mark : marks) {
             total += mark;
         }
-        this.average = total / 5.0;
+        this.average = total / (double) marks.length;
+
     }
 
     // Assign grade (realistic)
